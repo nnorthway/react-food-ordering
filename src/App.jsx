@@ -30,9 +30,31 @@ function App() {
 
   function handleAddToCart(id) {
     setCart(prevCart => {
-      const newCart = [...prevCart, menu.filter((item) => item.id === id)]
-      return newCart;
+      const menuItem = menu.filter((item) => item.id === id);
+      const cartItem = cart.filter((item) => item.id === id);
+      if (!cartItem.length) {
+        const updatedMenuItem = {...menuItem[0], quantity: 1};
+        const newCart = [...prevCart, updatedMenuItem];
+        return newCart
+      } else {
+        const updatedMenuItem = {...cartItem[0], quantity: cartItem[0].quantity + 1};
+        const newCart = [...prevCart.filter((item) => item.id !== id), updatedMenuItem];
+        return newCart;
+      }
     });
+  }
+
+  function handleCartDelete(id) {
+    setCart(prevCart => {
+      const cartItem = cart.filter((item) => item.id === id);
+      const prevCartCopy = prevCart.filter((item) => item.id !== id);
+      if (cartItem.length && cartItem[0].quantity > 1) {
+        const updatedItem = {...cartItem[0], quantity: cartItem[0].quantity - 1};
+        return [...prevCartCopy, updatedItem];
+      } else {
+        return prevCartCopy;
+      }
+    })
   }
 
   function handleCartToggle() {
@@ -47,7 +69,23 @@ function App() {
     <>
       <Header cart={cart} cartCount={cart.length} openCart={handleCartToggle} />
       <Modal open={cartOpen} onClose={handleCartToggle}>
-        Your Cart
+        <h2>Your Cart</h2>
+        <ul>
+          {cart.map((el) => {
+            return (
+              <li key={el.id} className="cart-item">
+                <p>
+                  {el.name} - ${el.price * el.quantity}
+                </p>
+                <div className="cart-item-actions">
+                  <button onClick={() => handleCartDelete(el.id)}>-</button>
+                  {el.quantity}
+                  <button onClick={() => handleAddToCart(el.id)}>+</button>
+                </div>
+              </li>
+            )
+          })}
+        </ul>
       </Modal>
       <Modal open={checkoutOpen} onClose={toggleCheckout}>
         Checkout

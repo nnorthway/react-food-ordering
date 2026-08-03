@@ -1,3 +1,8 @@
+/**TODO:
+ * add 'action' prop for a confirmation action & button text
+ * should be two buttons wrapped in a div.modal-actions, first button closes the modal, second one is the specified action
+ */
+
 import { useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 
