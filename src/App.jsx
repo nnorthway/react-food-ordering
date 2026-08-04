@@ -1,6 +1,7 @@
 import Header from "./components/Header.jsx";
 import Menu from "./components/Menu.jsx";
 import Modal from "./components/Modal.jsx";
+import Cart from "./components/Cart.jsx";
 import { useState, useEffect } from "react";
 import { fetchMenu } from "./http.js";
 
@@ -31,29 +32,28 @@ function App() {
   function handleAddToCart(id) {
     setCart(prevCart => {
       const menuItem = menu.filter((item) => item.id === id);
-      const cartItem = cart.filter((item) => item.id === id);
-      if (!cartItem.length) {
-        const updatedMenuItem = {...menuItem[0], quantity: 1};
-        const newCart = [...prevCart, updatedMenuItem];
-        return newCart
+      const cartItemIndex = prevCart.findIndex((item) => item.id === id);
+      if (cartItemIndex === -1) {
+        menuItem[0].quantity = 1;
+        return [...prevCart, menuItem[0]];
       } else {
-        const updatedMenuItem = {...cartItem[0], quantity: cartItem[0].quantity + 1};
-        const newCart = [...prevCart.filter((item) => item.id !== id), updatedMenuItem];
-        return newCart;
+        const copy = prevCart.filter((item) => item.id !== id);
+        const updatedItem = {...prevCart[cartItemIndex], quantity: prevCart[cartItemIndex].quantity + 1};
+        copy.splice(cartItemIndex, 0, updatedItem);
+        return copy;
       }
     });
   }
 
   function handleCartDelete(id) {
     setCart(prevCart => {
-      const cartItem = cart.filter((item) => item.id === id);
-      const prevCartCopy = prevCart.filter((item) => item.id !== id);
-      if (cartItem.length && cartItem[0].quantity > 1) {
-        const updatedItem = {...cartItem[0], quantity: cartItem[0].quantity - 1};
-        return [...prevCartCopy, updatedItem];
-      } else {
-        return prevCartCopy;
-      }
+      const cartItemIndex = prevCart.findIndex((item) => item.id === id);
+      const copy = prevCart.filter((item) => item.id !== id);
+      if (prevCart[cartItemIndex].quantity > 1) {
+        const updatedItem = {...prevCart[cartItemIndex], quantity: prevCart[cartItemIndex].quantity - 1};
+        copy.splice(cartItemIndex, 0, updatedItem);
+      } 
+      return copy;
     })
   }
 
@@ -67,25 +67,12 @@ function App() {
 
   return (
     <>
-      <Header cart={cart} cartCount={cart.length} openCart={handleCartToggle} />
+      <Header cart={cart} cartCount={cart?.length} openCart={handleCartToggle} />
       <Modal open={cartOpen} onClose={handleCartToggle}>
-        <h2>Your Cart</h2>
-        <ul>
-          {cart.map((el) => {
-            return (
-              <li key={el.id} className="cart-item">
-                <p>
-                  {el.name} - ${el.price * el.quantity}
-                </p>
-                <div className="cart-item-actions">
-                  <button onClick={() => handleCartDelete(el.id)}>-</button>
-                  {el.quantity}
-                  <button onClick={() => handleAddToCart(el.id)}>+</button>
-                </div>
-              </li>
-            )
-          })}
-        </ul>
+        <Cart 
+          addItem={handleAddToCart} 
+          deleteItem={handleCartDelete} 
+          userCart={cart} />
       </Modal>
       <Modal open={checkoutOpen} onClose={toggleCheckout}>
         Checkout
