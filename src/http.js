@@ -6,3 +6,17 @@ export async function fetchMenu() {
   }
   return data;
 }
+
+export async function postData(data) {
+  const response = await fetch("http://localhost:3000/orders", {
+    method: 'POST',
+    headers: {
+      'Content-type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+  if (!response.ok) {
+    throw new Error("Failed to post");
+  }
+  return response;
+}

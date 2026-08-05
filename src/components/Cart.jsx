@@ -1,4 +1,4 @@
-export default function Cart({userCart, addItem, deleteItem}) {
+export default function Cart({userCart, addItem, deleteItem, total, handleCloseClick, handleConfirm}) {
   return (
     <div className="cart">
       <h2>Your Cart</h2>
@@ -19,6 +19,11 @@ export default function Cart({userCart, addItem, deleteItem}) {
         })}
         {userCart.length === 0 && "Your cart is empty."}
       </ul>
+      <p>${total}</p>
+      <div className="modal-actions">
+        <button className="text-button" onClick={handleCloseClick}>Cancel</button>
+        <button className="button" onClick={handleConfirm}>Checkout</button>
+      </div>
     </div>
   )
 }
