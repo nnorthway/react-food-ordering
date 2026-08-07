@@ -1,23 +1,27 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { currencyFormatter } from "../util/formatting.js";
+import CartContext from "../store/CartContext.jsx";
 
-export default function MenuItem({item,addToCart}) {
+export default function MenuItem({item}) {
   const [cartText,setCartText] = useState("Add to Cart");
 
-  function handleAddToCart(id) {
+  const cartCtx = useContext(CartContext);
+
+  function handleAddToCart() {
     setCartText("Added!");
     const cartTextTimeout = setTimeout(() => {
       setCartText("Add to Cart");
     }, 2000);
-    addToCart(id);
+    cartCtx.addItem(item);
   }
   return (
     <div className="meal-item" key={item.id}>
         <img src={`http://localhost:3000/${item.image}`} alt={item.name} />
         <div className="meal-item-description">
           <h3>{item.name}</h3>
-          <span className="meal-item-price">{item.price}</span>
+          <span className="meal-item-price">{currencyFormatter.format(item.price)}</span>
           <p>{item.description}</p>
-          <button className="button" onClick={() => {handleAddToCart(item.id)}}>{cartText}</button>
+          <button className="button" onClick={handleAddToCart}>{cartText}</button>
         </div>
     </div>
   );
